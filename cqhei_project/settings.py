@@ -11,30 +11,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # CORE SETTINGS
 # ------------------------------------------------------------------------------
 
-SECRET_KEY = os.getenv(
-    'SECRETKEY',
-    'y6-7nxxz0abww_*ej^37=7)=ccc)9!ik+sogbdygdjk#aqt9jg'
-)
+SECRET_KEY = os.getenv("SECRETKEY")
 
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = os.getenv(
-    'ALLOWEDHOSTS',
-    'cqhei-webapp-hmbfaqayd5ajhkdt.centralus-01.azurewebsites.net,localhost,127.0.0.1'
-).split(',')
+ALLOWED_HOSTS = os.getenv("ALLOWEDHOSTS", "*").split(",")
 
 # ------------------------------------------------------------------------------
 # APPLICATIONS
 # ------------------------------------------------------------------------------
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'cqhei_app',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "cqhei_app",
 ]
 
 # ------------------------------------------------------------------------------
@@ -42,17 +36,17 @@ INSTALLED_APPS = [
 # ------------------------------------------------------------------------------
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'cqhei_project.urls'
+ROOT_URLCONF = "cqhei_project.urls"
 
 # ------------------------------------------------------------------------------
 # TEMPLATES
@@ -60,61 +54,66 @@ ROOT_URLCONF = 'cqhei_project.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'cqhei_project.wsgi.application'
+WSGI_APPLICATION = "cqhei_project.wsgi.application"
 
 # ------------------------------------------------------------------------------
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
 
-RUNNING_COLLECTSTATIC = 'collectstatic' in sys.argv
+RUNNING_COLLECTSTATIC = "collectstatic" in sys.argv
+
+DB_ENV_READY = all(
+    os.getenv(k)
+    for k in ["DBNAME", "DBUSER", "DBPASSWORD", "DBHOST"]
+)
 
 if RUNNING_COLLECTSTATIC:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
-elif 'WEBSITE_HOSTNAME' in os.environ and os.getenv('DBNAME'):
+elif "WEBSITE_HOSTNAME" in os.environ and DB_ENV_READY:
     DATABASES = {
-        'default': {
-            'ENGINE': 'mssql',
-            'NAME': os.getenv('DBNAME'),
-            'USER': os.getenv('DBUSER'),
-            'PASSWORD': os.getenv('DBPASSWORD'),
-            'HOST': os.getenv('DBHOST'),
-            'PORT': os.getenv('DBPORT', '1433'),
-            'OPTIONS': {
-                'driver': 'ODBC Driver 17 for SQL Server',
-                'extra_params': (
+        "default": {
+            "ENGINE": "mssql",
+            "NAME": os.getenv("DBNAME"),
+            "USER": os.getenv("DBUSER"),
+            "PASSWORD": os.getenv("DBPASSWORD"),
+            "HOST": os.getenv("DBHOST"),
+            "PORT": os.getenv("DBPORT", "1433"),
+            "OPTIONS": {
+                "driver": "ODBC Driver 17 for SQL Server",
+                "extra_params": (
                     "Encrypt=yes;"
                     "TrustServerCertificate=no;"
                     "Connection Timeout=30;"
-                )
+                ),
             },
         }
     }
 
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
@@ -123,18 +122,18 @@ else:
 # ------------------------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 # ------------------------------------------------------------------------------
 # INTERNATIONALIZATION
 # ------------------------------------------------------------------------------
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
@@ -142,16 +141,20 @@ USE_TZ = True
 # STATIC FILES
 # ------------------------------------------------------------------------------
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_URL = "/static/"
+
+STATICFILES_DIRS = (
+    [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+)
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ------------------------------------------------------------------------------
-# SECURITY (FIXED — AZURE ONLY)
+# SECURITY (AZURE-AWARE)
 # ------------------------------------------------------------------------------
 
-IS_AZURE = 'WEBSITE_HOSTNAME' in os.environ
+IS_AZURE = "WEBSITE_HOSTNAME" in os.environ
 
 if IS_AZURE:
     SECURE_HSTS_SECONDS = 31536000
@@ -160,9 +163,8 @@ if IS_AZURE:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 else:
-    # LOCAL DEVELOPMENT — DO NOT FORCE HTTPS
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
@@ -171,4 +173,4 @@ else:
 # DEFAULT PRIMARY KEY
 # ------------------------------------------------------------------------------
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
