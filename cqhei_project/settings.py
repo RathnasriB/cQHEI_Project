@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
+# Load .env for local dev only (Azure ignores it)
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,11 +12,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # CORE SETTINGS
 # ------------------------------------------------------------------------------
 
-SECRET_KEY = os.getenv("SECRETKEY")
+SECRET_KEY = os.getenv(
+    "SECRETKEY",
+    "unsafe-local-dev-secret-key-change-this"
+)
 
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = os.getenv("ALLOWEDHOSTS", "*").split(",")
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWEDHOSTS",
+    "localhost,127.0.0.1"
+).split(",")
 
 # ------------------------------------------------------------------------------
 # APPLICATIONS
@@ -71,17 +78,20 @@ TEMPLATES = [
 WSGI_APPLICATION = "cqhei_project.wsgi.application"
 
 # ------------------------------------------------------------------------------
-# DATABASE CONFIGURATION
+# DATABASE CONFIGURATION (FIXED)
 # ------------------------------------------------------------------------------
 
 RUNNING_COLLECTSTATIC = "collectstatic" in sys.argv
 
-DB_ENV_READY = all(
-    os.getenv(k)
-    for k in ["DBNAME", "DBUSER", "DBPASSWORD", "DBHOST"]
-)
+DB_ENV_READY = all([
+    os.getenv("DBNAME"),
+    os.getenv("DBUSER"),
+    os.getenv("DBPASSWORD"),
+    os.getenv("DBHOST"),
+])
 
 if RUNNING_COLLECTSTATIC:
+    # Never hit Azure SQL during build
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -90,9 +100,10 @@ if RUNNING_COLLECTSTATIC:
     }
 
 elif "WEBSITE_HOSTNAME" in os.environ and DB_ENV_READY:
+    # Azure App Service + Azure SQL
     DATABASES = {
         "default": {
-            "ENGINE": "mssql",
+            "ENGINE": "sql_server.pyodbc",
             "NAME": os.getenv("DBNAME"),
             "USER": os.getenv("DBUSER"),
             "PASSWORD": os.getenv("DBPASSWORD"),
@@ -110,6 +121,7 @@ elif "WEBSITE_HOSTNAME" in os.environ and DB_ENV_READY:
     }
 
 else:
+    # Local development fallback
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -138,17 +150,16 @@ USE_I18N = True
 USE_TZ = True
 
 # ------------------------------------------------------------------------------
-# STATIC FILES
+# STATIC FILES (Azure-safe)
 # ------------------------------------------------------------------------------
 
 STATIC_URL = "/static/"
-
-STATICFILES_DIRS = (
-    [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
-)
-
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+STATICFILES_STORAGE = (
+    "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
 
 # ------------------------------------------------------------------------------
 # SECURITY (AZURE-AWARE)
@@ -157,9 +168,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 IS_AZURE = "WEBSITE_HOSTNAME" in os.environ
 
 if IS_AZURE:
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
