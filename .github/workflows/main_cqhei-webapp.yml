@@ -8,7 +8,9 @@
 name: Build and deploy Python app to Azure Web App - cqhei-webapp
 
 on:
- []
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -18,14 +20,15 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Python version
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # 🔴 REQUIRED FIX — Install ODBC drivers for pyodbc
+      # REQUIRED — install system deps for pyodbc + SQL Server
       - name: Install SQL Server ODBC Driver
         run: |
           sudo apt-get update
@@ -35,7 +38,6 @@ jobs:
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev
 
-      # Install Python dependencies
       - name: Create virtual environment and install dependencies
         run: |
           python -m venv antenv
@@ -43,8 +45,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Upload app artifact (exclude virtualenv)
-      - name: Upload artifact for deployment jobs
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: python-app
@@ -60,17 +61,17 @@ jobs:
       contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      - name: Login to Azure
+      - name: Login to Azure (Service Principal)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_CB98D2B7239C492B89EE46EF681653F7 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5BE058A3583D41B3AE5CD566310E8EA9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_293843B1352846ABACF24AB11EF12890 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
