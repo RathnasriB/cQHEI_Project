@@ -51,6 +51,9 @@ class CQHEISurvey(models.Model):
     cover_shallow_slow_areas = models.BooleanField(default=False)
     cover_shrubs_small_trees = models.BooleanField(default=False)
 
+    # ✅ PERSISTED SECTION II SCORE (FROM SQL COMPUTED COLUMN)
+    cover_score = models.IntegerField(null=True, blank=True)
+
     # ================= SECTION III =================
     curviness_two_plus_good_bends = models.BooleanField(default=False)
     curviness_one_two_good_bends = models.BooleanField(default=False)
@@ -106,7 +109,7 @@ class CQHEISurvey(models.Model):
     substrate_smaller_fingernail = models.BooleanField(default=False)
 
     # ==================================================
-    # ✅ MODEL-LEVEL VALIDATION FOR "OTHER"
+    # MODEL-LEVEL VALIDATION FOR "OTHER"
     # ==================================================
     def clean(self):
         if self.reach_length == "other" and not self.reach_length_custom:

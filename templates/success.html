@@ -17,22 +17,35 @@
                             <h1 class="card-title">Survey Submitted Successfully!</h1>
                             <p class="card-text lead">Thank you for completing the CQHEI survey.</p>
                         </div>
-                        
-                        <div class="mb-4">
+
+                        <div class="mb-4 text-start">
                             <h4>Survey Details</h4>
-                            <p><strong>Location:</strong> {{ survey.location_name }}</p>
-                            <p><strong>Surveyor:</strong> {{ survey.surveyor_name }}</p>
+                            <p><strong>River Site:</strong> {{ survey.river_site }}</p>
+                            <p><strong>Surveyor / Group:</strong> {{ survey.name_group }}</p>
                             <p><strong>Date:</strong> {{ survey.survey_date|date:"F j, Y" }}</p>
-                            {% if survey.notes %}
-                            <p><strong>Notes:</strong> {{ survey.notes }}</p>
+                        </div>
+
+                        <div class="mb-4 text-start">
+                            <h4>Section II – Cover Score</h4>
+                            {% if survey.cover_score is not None %}
+                                <p class="fs-5">
+                                    <strong>Cover Score:</strong>
+                                    <span class="badge bg-success">
+                                        {{ survey.cover_score }}
+                                    </span>
+                                </p>
+                            {% else %}
+                                <p class="text-muted">
+                                    Cover score not available.
+                                </p>
                             {% endif %}
                         </div>
-                        
+
                         <div class="d-grid gap-2 d-md-block">
                             <a href="{% url 'survey_form' %}" class="btn btn-primary btn-lg">
                                 Submit Another Survey
                             </a>
-                            <a href="{% url 'survey_results' %}" class="btn btn-outline-secondary btn-lg">
+                            <a href="{% url 'survey_list' %}" class="btn btn-outline-secondary btn-lg">
                                 View All Surveys
                             </a>
                         </div>
