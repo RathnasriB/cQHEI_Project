@@ -1,7 +1,7 @@
-# Docs for the Azure Web Apps Deploy action:
-# https://github.com/Azure/webapps-deploy
+# Azure Web Apps Deploy Action
+# Uses Azure Oryx for build & startup (NO startup.sh)
 
-name: Build and deploy Python app to Azure Web App - cQHEI-Input
+name: Deploy Django app to Azure Web App - cQHEI-Input
 
 on:
   push:
@@ -20,14 +20,15 @@ jobs:
         uses: actions/checkout@v4
 
       # IMPORTANT:
-      # Do NOT create virtualenv
-      # Do NOT run pip install
-      # Azure Oryx must do the build
+      # - Do NOT create virtualenv
+      # - Do NOT run pip install
+      # - Oryx will install Django + deps from requirements.txt
+      # - Azure will auto-generate gunicorn
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'cQHEI-Input'
-          slot-name: 'Production'
+          app-name: cQHEI-Input
+          slot-name: Production
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_698929C7A71242E4ACEC11569AD14080 }}
           package: .
